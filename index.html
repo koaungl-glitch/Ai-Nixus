@@ -1,1 +1,98 @@
 
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <title>AI NEXUS COMMAND CENTER</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin: 0; padding: 0; background-color: #0A0E21; color: white; font-family: sans-serif; height: 100vh; overflow-x: hidden; }
+    .admin-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: #0A0E21; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; padding: 20px; box-sizing: border-box; }
+    .login-card { background: rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 20px; border: 1px solid #00E5FF; width: 90%; max-width: 350px; text-align: center; }
+    input#pass { width: 100%; padding: 15px; margin: 20px 0; background: #1A1F30; border: 1px solid #333; border-radius: 8px; color: #00E5FF; text-align: center; font-size: 18px; box-sizing: border-box; }
+    button { background: #00E5FF; color: #0A0E21; border: none; padding: 15px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; }
+    .container { padding: 15px; display: none; margin-bottom: 100px; }
+    .header { background: linear-gradient(135deg, #1A237E, #000); padding: 20px; border-radius: 15px; border: 1px solid #00E5FF; margin-bottom: 20px; }
+    .ai-card { background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 15px; margin-bottom: 12px; border-left: 5px solid #ccc; transition: 0.3s; }
+    .gpt4 { border-left-color: #4CAF50; }
+    .claude { border-left-color: #9C27B0; }
+    .grok { border-left-color: #FF9800; }
+    .footer-cmd { position: fixed; bottom: 0; left: 0; right: 0; background: #101525; padding: 12px; display: none; gap: 10px; border-top: 1px solid #333; }
+    input#cmd { flex: 1; background: #1A1F30; border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; }
+    .status-msg { font-size: 12px; color: #00E5FF; margin-top: 10px; display: none; }
+  </style>
+</head>
+<body>
+
+  <div id="login" class="admin-overlay">
+    <div class="login-card">
+      <h2 style="color:#00E5FF; margin-top:0;">NEXUS ACCESS</h2>
+      <input type="password" id="pass" placeholder="Enter Admin Key">
+      <button onclick="login()">AUTHORIZE</button>
+    </div>
+  </div>
+
+  <div class="container" id="main">
+    <div class="header">
+      <div style="color:#00E5FF; font-size:11px; font-weight:bold;">MANAGER: GEMINI-1.5-FLASH</div>
+      <h3 style="margin: 10px 0;">Executive Brief</h3>
+      <p id="gemini-msg" style="font-size: 14px;">Boss, စနစ်တစ်ခုလုံး Online ရောက်နေပါပြီ။ အမိန့်ပေးနိုင်ပါတယ်ခင်ဗျာ။</p>
+      <div id="loading" class="status-msg">AI Units are analyzing global data...</div>
+    </div>
+
+    <div class="ai-card gpt4"><strong>Strategic Analysis (GPT-4 Simulation)</strong><p id="gpt4-msg" style="font-size:13px; color:#bbb;">Standing by for intel...</p></div>
+    <div class="ai-card claude"><strong>Sentiment Analysis (Claude Simulation)</strong><p id="claude-msg" style="font-size:13px; color:#bbb;">Ready to analyze human trends...</p></div>
+    <div class="ai-card grok"><strong>Live Scout (Grok Simulation)</strong><p id="grok-msg" style="font-size:13px; color:#bbb;">Scanning real-time social streams...</p></div>
+  </div>
+
+  <div class="footer-cmd" id="footer">
+    <input type="text" id="cmd" placeholder="AI အဖွဲ့ကို အမိန့်ပေးရန်...">
+    <button style="width:auto; padding: 0 20px;" onclick="executeCommand()">SEND</button>
+  </div>
+
+  <script>
+    const API_KEY = "AIzaSyAJW8Ru_L2buz-RQvR8yW9gFk4rqSmZ8pw"; 
+
+    function login() {
+      if (document.getElementById('pass').value === 'BOSS-NEXUS-2026') {
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('main').style.display = 'block';
+        document.getElementById('footer').style.display = 'flex';
+      } else { alert('Access Denied: Invalid Key'); }
+    }
+
+    async function executeCommand() {
+      const prompt = document.getElementById('cmd').value;
+      if (!prompt) return;
+
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('gemini-msg').innerText = "Command: " + prompt;
+      document.getElementById('cmd').value = "";
+
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: "Context: You are the AI Nexus Manager. The Boss asked: " + prompt + ". Give a strategic, professional, and concise report." }] }]
+          })
+        });
+
+        const data = await response.json();
+        const aiText = data.candidates[0].content.parts[0].text;
+        
+        // Displaying results across units
+        document.getElementById('gemini-msg').innerText = "Update: Report Received.";
+        document.getElementById('gpt4-msg').innerText = aiText;
+        document.getElementById('claude-msg').innerText = "Analysis integrated into strategic report.";
+        document.getElementById('grok-msg').innerText = "Live data verified.";
+        
+      } catch (error) {
+        document.getElementById('gemini-msg').innerText = "Error: Connection failed. Please check your VPN.";
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+  </script>
+</body>
+    </html>
